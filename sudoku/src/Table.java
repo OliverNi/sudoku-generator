@@ -60,7 +60,7 @@ public class Table {
                 }
                 else{
                     //Valid number
-                    placeNumberInCell(x, y, pool.get(nextVal));
+                    placeNumberInSquare(x, y, pool.get(nextVal));
                     pool.remove(nextVal);
                     moveQuarantinesToPool();
                 }
@@ -150,7 +150,7 @@ public class Table {
      * @param x x-coordinate in the table of the cell to be checked
      * @param y y-coordinate in the table of the cell to be checked
      */
-    private void placeNumberInCell(int x, int y, int number){
+    private void placeNumberInSquare(int x, int y, int number){
 
     }
 
