@@ -8,8 +8,12 @@ import java.util.Random;
  */
 public class Table {
     public static final int TABLE_SIZE = 4;
-    public static final double SQUARE_SIZE = Math.sqrt(TABLE_SIZE);
+    public static final int SQUARE_SIZE = (int)Math.sqrt(TABLE_SIZE);
     private Random rand;
+
+    //Keeps track of backtracking history to make sure that
+    // a number is not tried several times in one cell
+    ArrayList<Integer>[][] backtrackHist;
     //Pool which stores available numbers
     private ArrayList<Integer> pool;
     /* Quarantine for numbers where they are placed temporarily
@@ -24,17 +28,22 @@ public class Table {
      * Constructs an empty sudoku table
      */
     public Table(){
+        backtrackHist= new ArrayList[TABLE_SIZE][TABLE_SIZE];
+        for(int i=0;i<backtrackHist.length;i++){
+            for(int j=0;j<backtrackHist[i].length;j++){
+                backtrackHist[i][j]=new ArrayList<Integer>();
+            }
+        }
         rand = new Random();
         pool = new ArrayList<>();
         quarantine = new ArrayList<>();
-        squares = new Square[TABLE_SIZE][TABLE_SIZE];
+        squares = new Square[SQUARE_SIZE][SQUARE_SIZE];
         for (int i = 1; i <= TABLE_SIZE; i++){
             pool.add(i);
         }
 
-        double sqrt = Math.sqrt(TABLE_SIZE);
-        for (int y = 0; y < sqrt; y++){
-            for (int x = 0; x < sqrt; x++){
+        for (int y = 0; y < SQUARE_SIZE; y++){
+            for (int x = 0; x < SQUARE_SIZE; x++){
                 squares[x][y] = new Square();
             }
         }
@@ -49,17 +58,28 @@ public class Table {
         for (int y = 0; y < TABLE_SIZE; y++){
             for (int x = 0; x < TABLE_SIZE; x++){
                 nextVal = nextRandomFromPool();
-                if (checkConflict(x, y, pool.get(nextVal))){
-                    //conflict detected
-                    quarantine.add(pool.get(nextVal));
-                    pool.remove(nextVal);
+                if (pool.size() == 0){
+                    int temp = x;
                     x--;
-                    //Check if this was the last option - if so -> backtrack
-                    if (pool.size() == 0){
+                    moveQuarantinesToPool();
+                    int val = backtrack(x, y);
+                    if (backtrackHist[temp][y].contains(val)){
+                        //The previous backtrack-number has already been tried -> go back one more step
                         x--;
                         backtrack(x, y);
-
+                        x--;
                     }
+                    else {
+                        //The backtrack was successful -> refill the pool
+                        x--;
+                        moveQuarantinesToPool();
+                    }
+                }
+                else if (checkConflict(x, y, pool.get(nextVal))){
+                    //conflict detected
+                    backtrackHist[x][y].add(pool.get(nextVal));
+                    x--;
+                    quarantine.add(pool.remove(nextVal));
                 }
                 else{
                     //Valid number
@@ -67,7 +87,9 @@ public class Table {
                     pool.remove(nextVal);
                     moveQuarantinesToPool();
                 }
+                System.out.println(output());
             }
+            restorePool();
         }
     }
 
@@ -77,32 +99,38 @@ public class Table {
      */
     public String output(){
         StringBuilder builder = new StringBuilder();
-        builder.append("|");
+        builder.append("|--");
         for (int i = 0; i < TABLE_SIZE; i++){
             builder.append("-");
         }
-
         builder.append("-|");
         builder.append("\n");
 
-        double sqrt = Math.sqrt(TABLE_SIZE);
-        for (int i = 0; i < sqrt; i++){
-            for (int j = 0; j < sqrt; j++){
+        int nrOfSquares = TABLE_SIZE / SQUARE_SIZE;
+        int row = 0;
+        for (int y = 0; y < SQUARE_SIZE; y++) {
+            //Print one Square-row
+            builder.append("|");
+            for (int x = 0; x < nrOfSquares; x++) {
+                builder.append(squares[x][y].rowOutput(row));
                 builder.append("|");
-                for (int k = 0; k < sqrt; k++){
-                    for (int l = 0; l < sqrt; l++){
-                        builder.append(squares[i][j].getNumbers()[k][l]);
-                    }
-                    builder.append("|");
-                }
-                builder.append("\n");
             }
+            builder.append("\n");
+            builder.append("|");
+            row = (row + 1) % SQUARE_SIZE;
+            for (int x = 0; x < nrOfSquares; x++) {
+                builder.append(squares[x][y].rowOutput(row));
+                builder.append("|");
+            }
+            builder.append("\n");
+            row = (row + 1) % SQUARE_SIZE;
         }
-        builder.append("|");
+        builder.append("|--");
         for (int i = 0; i < TABLE_SIZE; i++){
             builder.append("-");
         }
         builder.append("-|");
+        builder.append("\n");
 
         return builder.toString();
     }
@@ -112,7 +140,11 @@ public class Table {
      * @return the index of the number in the pool
      */
     private int nextRandomFromPool(){
-        return rand.nextInt(pool.size());
+        int size;
+        if ((size = pool.size()) > 0) {
+            return rand.nextInt(size);
+        }
+        return 0;
     }
 
     /**
@@ -132,28 +164,27 @@ public class Table {
             //Conflict detected - number already exists in column (x-axis)
             return true;
         }
-        else if (checkConflictRow(y)){ //@TODO Maybe not necessary?
-            //Conflict detected - number already exists in row (y-axis)
-            return true;
-        }
 
         return false;
     }
 
+    /**
+     * Checks for conflicts in the x-axis
+     * @param x x table-coordinate
+     * @param y y table-coordinate
+     * @param number number to be checked
+     * @return TRUE: conflict found; FALSE: Conflict not found
+     */
     private boolean checkConflictColumn(int x, int y, int number){
         while (y > 0){
             y--;
             Pair<Integer, Integer> sCoord = Square.calcSquareNumber(x, y);
-            int sX = x - (sCoord.getX()*(int)SQUARE_SIZE);
-            int sY = y - (sCoord.getY()*(int)SQUARE_SIZE);
+            int sX = x % SQUARE_SIZE;
+            int sY = y % SQUARE_SIZE;
             if (squares[sCoord.getX()][sCoord.getY()].getNumbers()[sX][sY] == number){
                 return true;
             }
         }
-        return false;
-    }
-
-    private boolean checkConflictRow(int row){
         return false;
     }
 
@@ -164,8 +195,8 @@ public class Table {
      */
     private void placeNumberInSquare(int x, int y, int number){
         Pair<Integer, Integer> sCoord = Square.calcSquareNumber(x, y);
-        int sX = x - (sCoord.getX()*(int)SQUARE_SIZE);
-        int sY = y - (sCoord.getY()*(int)SQUARE_SIZE);
+        int sX = x % SQUARE_SIZE;
+        int sY = y % SQUARE_SIZE;
         squares[sCoord.getX()][sCoord.getY()].getNumbers()[sX][sY] = number;
     }
 
@@ -177,9 +208,12 @@ public class Table {
         int count = 0;
         for (Integer i:
                 quarantine) {
-            pool.add(i);
-            count++;
+            if (!pool.contains(i)) {
+                pool.add(i);
+                count++;
+            }
         }
+        quarantine.clear();
         return count;
     }
 
@@ -187,11 +221,42 @@ public class Table {
      * Moves back one step in the table-filling process
      * @param x x table-coordinate
      * @param y y table-coordinate
+     * @return The value which was quarantined
      */
-    private void backtrack(int x, int y){
+    private int backtrack(int x, int y){
         Pair<Integer, Integer> squareCoord = Square.calcSquareNumber(x, y);
-        quarantine.add(squares[squareCoord.getX()][squareCoord.getY()]
-                .getNumbers()[x - (squareCoord.getX()*(int)SQUARE_SIZE)][y -
-                (squareCoord.getX()*(int)SQUARE_SIZE)]);
+        int sX = x % SQUARE_SIZE;
+        int sY = y % SQUARE_SIZE;
+        int val = squares[squareCoord.getX()][squareCoord.getY()]
+                .getNumbers()[sX][sY];
+        squares[squareCoord.getX()][squareCoord.getY()]
+                .getNumbers()[sX][sY] = 0;
+        quarantine.add(val);
+        return val;
+    }
+
+    /**
+     * Restores the pool and the quarantine to its initial state
+     */
+    private void restorePool(){
+        pool = new ArrayList<>();
+        quarantine = new ArrayList<>();
+        for (int i = 1; i <= TABLE_SIZE; i++){
+            pool.add(i);
+        }
+    }
+
+    /**
+     * Retrieves the number at specified table-coordinates
+     * @param x x table-coordinate
+     * @param y y table-coordinate
+     * @return the number stored at the specified table-coordinates
+     */
+    private int getNumber(int x, int y){
+        Pair<Integer, Integer> squareCoord = Square.calcSquareNumber(x, y);
+        int sX = x % SQUARE_SIZE;
+        int sY = y % SQUARE_SIZE;
+        return squares[squareCoord.getX()][squareCoord.getY()]
+                .getNumbers()[sX][sY];
     }
 }
