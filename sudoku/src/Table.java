@@ -8,6 +8,7 @@ import java.util.Random;
  */
 public class Table {
     public static final int TABLE_SIZE = 4;
+    public static final double SQUARE_SIZE = Math.sqrt(TABLE_SIZE);
     private Random rand;
     //Pool which stores available numbers
     private ArrayList<Integer> pool;
@@ -177,6 +178,8 @@ public class Table {
      */
     private void backtrack(int x, int y){
         Pair<Integer, Integer> squareCoord = Square.calcSquareNumber(x, y);
-        quarantine.add(squares[squareCoord.getX()][squareCoord.getY()].getNumbers()[x][y]);
+        quarantine.add(squares[squareCoord.getX()][squareCoord.getY()]
+                .getNumbers()[x - (squareCoord.getX()*(int)SQUARE_SIZE)][y -
+                (squareCoord.getX()*(int)SQUARE_SIZE)]);
     }
 }
