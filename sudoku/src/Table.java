@@ -22,7 +22,7 @@ public class Table {
     public Table(){
         pool = new ArrayList<>();
         quarantine = new ArrayList<>();
-
+        cells = new Cell[TABLE_SIZE][TABLE_SIZE];
         for (int i = 1; i <= TABLE_SIZE; i++){
             pool.add(i);
         }
@@ -48,7 +48,35 @@ public class Table {
      * @return the table in String format
      */
     public String output(){
-        return "";
+        StringBuilder builder = new StringBuilder();
+        builder.append("|");
+        for (int i = 0; i < TABLE_SIZE; i++){
+            builder.append("-");
+        }
+
+        builder.append("-|");
+        builder.append("\n");
+
+        double sqrt = Math.sqrt(TABLE_SIZE);
+        for (int i = 0; i < sqrt; i++){
+            for (int j = 0; j < sqrt; j++){
+                builder.append("|");
+                for (int k = 0; k < sqrt; k++){
+                    for (int l = 0; l < sqrt; l++){
+                        builder.append(cells[i][j].getNumbers()[k][l]);
+                    }
+                    builder.append("|");
+                }
+                builder.append("\n");
+            }
+        }
+        builder.append("|");
+        for (int i = 0; i < TABLE_SIZE; i++){
+            builder.append("-");
+        }
+        builder.append("-|");
+
+        return builder.toString();
     }
 
     /**
