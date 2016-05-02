@@ -161,7 +161,13 @@ public class Table {
      * @return the number of numbers moved to the pool
      */
     private int moveQuarantinesToPool(){
-        return 0;
+        int count = 0;
+        for (Integer i:
+                quarantine) {
+            pool.add(i);
+            count++;
+        }
+        return count;
     }
 
     /**
