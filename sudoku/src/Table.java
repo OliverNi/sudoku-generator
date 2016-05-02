@@ -149,12 +149,15 @@ public class Table {
     }
 
     /**
-     * Place a number in a cell
+     * Place a number in a square
      * @param x x-coordinate in the table of the cell to be checked
      * @param y y-coordinate in the table of the cell to be checked
      */
     private void placeNumberInSquare(int x, int y, int number){
-
+        Pair<Integer, Integer> sCoord = Square.calcSquareNumber(x, y);
+        int sX = x - (sCoord.getX()*(int)SQUARE_SIZE);
+        int sY = y - (sCoord.getY()*(int)SQUARE_SIZE);
+        squares[sCoord.getX()][sCoord.getY()].getNumbers()[x][y] = number;
     }
 
     /**
