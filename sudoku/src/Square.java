@@ -1,3 +1,5 @@
+import helpers.Pair;
+
 /**
  * Created by ubuntu on 2016-05-02.
  */
@@ -8,6 +10,13 @@ public class Square {
      */
     public Square(){
         numbers = new int[Table.TABLE_SIZE][Table.TABLE_SIZE];
+    }
+
+    public static Pair<Integer, Integer> calcCellNumber(int x, int y){
+        double sqrt = Math.sqrt(Table.TABLE_SIZE);
+        int squareX = (x-1) / (int) sqrt;
+        int squareY = (y-1) / (int) sqrt;
+        return new Pair<>(squareX, squareY);
     }
 
     /**
