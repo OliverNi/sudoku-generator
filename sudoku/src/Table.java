@@ -1,3 +1,5 @@
+import helpers.Pair;
+
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -51,6 +53,10 @@ public class Table {
                     quarantine.add(pool.get(nextVal));
                     pool.remove(nextVal);
                     x--;
+                    //Check if this was the last option - if so -> backtrack
+                    if (pool.size() == 0){
+                        backtrack();
+                    }
                 }
                 else{
                     //Valid number
@@ -114,9 +120,28 @@ public class Table {
      * @return TRUE: conflict detected; FALSE: no conflict
      */
     private boolean checkConflict(int x, int y, int number){
+        Pair<Integer, Integer> pair = Square.calcSquareNumber(x, y);
+        if (squares[pair.getX()][pair.getY()].contains(number)){
+            //conflict detected - number already exists in square
+            return true;
+        }
+        else if (checkConflictColumn(x)) {
+            //Conflict detected - number alreadt exists in column (x-axis)
+            return true;
+        }
+        else if (checkConflictRow(y)){
+            //Conflict detected - number already exists in row (y-axis)
+            return true;
+        }
 
-        //@TODO Check if it is the last option
+        return false;
+    }
 
+    private boolean checkConflictColumn(int col){
+        return false;
+    }
+
+    private boolean checkConflictRow(int row){
         return false;
     }
 
