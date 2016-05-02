@@ -128,7 +128,7 @@ public class Table {
             //conflict detected - number already exists in square
             return true;
         }
-        else if (checkConflictColumn(x)) {
+        else if (checkConflictColumn(x, y, number)) {
             //Conflict detected - number already exists in column (x-axis)
             return true;
         }
@@ -140,7 +140,16 @@ public class Table {
         return false;
     }
 
-    private boolean checkConflictColumn(int col){
+    private boolean checkConflictColumn(int x, int y, int number){
+        while (y > 0){
+            y--;
+            Pair<Integer, Integer> sCoord = Square.calcSquareNumber(x, y);
+            int sX = x - (sCoord.getX()*(int)SQUARE_SIZE);
+            int sY = y - (sCoord.getY()*(int)SQUARE_SIZE);
+            if (squares[sCoord.getX()][sCoord.getY()].getNumbers()[sX][sY] == number){
+                return true;
+            }
+        }
         return false;
     }
 
@@ -157,7 +166,7 @@ public class Table {
         Pair<Integer, Integer> sCoord = Square.calcSquareNumber(x, y);
         int sX = x - (sCoord.getX()*(int)SQUARE_SIZE);
         int sY = y - (sCoord.getY()*(int)SQUARE_SIZE);
-        squares[sCoord.getX()][sCoord.getY()].getNumbers()[x][y] = number;
+        squares[sCoord.getX()][sCoord.getY()].getNumbers()[sX][sY] = number;
     }
 
     /**
