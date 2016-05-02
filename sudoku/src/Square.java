@@ -12,7 +12,13 @@ public class Square {
         numbers = new int[Table.TABLE_SIZE][Table.TABLE_SIZE];
     }
 
-    public static Pair<Integer, Integer> calcCellNumber(int x, int y){
+    /**
+     * Calculates square-number based on table coordinates
+     * @param x x table-coordinate
+     * @param y y table-coordinate
+     * @return square-number Pair
+     */
+    public static Pair<Integer, Integer> calcSquareNumber(int x, int y){
         double sqrt = Math.sqrt(Table.TABLE_SIZE);
         int squareX = (x-1) / (int) sqrt;
         int squareY = (y-1) / (int) sqrt;
