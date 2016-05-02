@@ -126,7 +126,7 @@ public class Table {
             return true;
         }
         else if (checkConflictColumn(x)) {
-            //Conflict detected - number alreadt exists in column (x-axis)
+            //Conflict detected - number already exists in column (x-axis)
             return true;
         }
         else if (checkConflictRow(y)){
