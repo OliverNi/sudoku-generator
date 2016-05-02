@@ -1,12 +1,12 @@
 /**
  * Created by ubuntu on 2016-05-02.
  */
-public class Cell {
+public class Square {
     int[][] numbers;
     /**
      * Constructs a sudoku cell(a square in the table)
      */
-    public Cell(){
+    public Square(){
         numbers = new int[Table.TABLE_SIZE][Table.TABLE_SIZE];
     }
 

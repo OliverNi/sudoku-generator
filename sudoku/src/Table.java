@@ -15,7 +15,7 @@ public class Table {
     private ArrayList<Integer> quarantine;
 
     //The squares in the table
-    private Cell[][] cells;
+    private Square[][] squares;
 
     /**
      * Constructs an empty sudoku table
@@ -24,7 +24,7 @@ public class Table {
         rand = new Random();
         pool = new ArrayList<>();
         quarantine = new ArrayList<>();
-        cells = new Cell[TABLE_SIZE][TABLE_SIZE];
+        squares = new Square[TABLE_SIZE][TABLE_SIZE];
         for (int i = 1; i <= TABLE_SIZE; i++){
             pool.add(i);
         }
@@ -32,7 +32,7 @@ public class Table {
         double sqrt = Math.sqrt(TABLE_SIZE);
         for (int y = 0; y < sqrt; y++){
             for (int x = 0; x < sqrt; x++){
-                cells[x][y] = new Cell();
+                squares[x][y] = new Square();
             }
         }
     }
@@ -82,7 +82,7 @@ public class Table {
                 builder.append("|");
                 for (int k = 0; k < sqrt; k++){
                     for (int l = 0; l < sqrt; l++){
-                        builder.append(cells[i][j].getNumbers()[k][l]);
+                        builder.append(squares[i][j].getNumbers()[k][l]);
                     }
                     builder.append("|");
                 }
@@ -103,9 +103,7 @@ public class Table {
      * @return the index of the number in the pool
      */
     private int nextRandomFromPool(){
-        int size;
-        if ((size = pool.size()) > 0)
-        return rand.nextInt(size);
+        return rand.nextInt(pool.size());
     }
 
     /**
