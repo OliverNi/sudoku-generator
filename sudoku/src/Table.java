@@ -1,11 +1,12 @@
 import java.util.ArrayList;
+import java.util.Random;
 
 /**
  * Created by ubuntu on 2016-05-02.
  */
 public class Table {
     public static final int TABLE_SIZE = 4;
-
+    private Random rand;
     //Pool which stores available numbers
     private ArrayList<Integer> pool;
     /* Quarantine for numbers where they are placed temporarily
@@ -20,6 +21,7 @@ public class Table {
      * Constructs an empty sudoku table
      */
     public Table(){
+        rand = new Random();
         pool = new ArrayList<>();
         quarantine = new ArrayList<>();
         cells = new Cell[TABLE_SIZE][TABLE_SIZE];
@@ -40,7 +42,24 @@ public class Table {
      * @param nrOfClues the number of initial clues in the table
      */
     public void generate(int nrOfClues){
-
+        int nextVal;
+        for (int y = 0; y < TABLE_SIZE; y++){
+            for (int x = 0; x < TABLE_SIZE; x++){
+                nextVal = nextRandomFromPool();
+                if (checkConflict(x, y, pool.get(nextVal))){
+                    //conflict detected
+                    quarantine.add(pool.get(nextVal));
+                    pool.remove(nextVal);
+                    x--;
+                }
+                else{
+                    //Valid number
+                    placeNumberInCell(x, y, pool.get(nextVal));
+                    pool.remove(nextVal);
+                    moveQuarantinesToPool();
+                }
+            }
+        }
     }
 
     /**
@@ -81,19 +100,22 @@ public class Table {
 
     /**
      * Picks a random number from the pool
-     * @return a number from the pool
+     * @return the index of the number in the pool
      */
     private int nextRandomFromPool(){
-        return 0;
+        int size;
+        if ((size = pool.size()) > 0)
+        return rand.nextInt(size);
     }
 
     /**
      * Checks if there are any conflicts caused by a cell's number
      * @param x x-coordinate in the table of the cell to be checked
      * @param y y-coordinate in the table of the cell to be checked
+     * @param number the number to be checked
      * @return TRUE: conflict detected; FALSE: no conflict
      */
-    private boolean checkConflict(int x, int y){
+    private boolean checkConflict(int x, int y, int number){
 
         //@TODO Check if it is the last option
 
