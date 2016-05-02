@@ -55,7 +55,9 @@ public class Table {
                     x--;
                     //Check if this was the last option - if so -> backtrack
                     if (pool.size() == 0){
-                        backtrack();
+                        x--;
+                        backtrack(x, y);
+
                     }
                 }
                 else{
@@ -129,7 +131,7 @@ public class Table {
             //Conflict detected - number already exists in column (x-axis)
             return true;
         }
-        else if (checkConflictRow(y)){
+        else if (checkConflictRow(y)){ //@TODO Maybe not necessary?
             //Conflict detected - number already exists in row (y-axis)
             return true;
         }
@@ -163,10 +165,12 @@ public class Table {
     }
 
     /**
-     *
+     * Moves back one step in the table-filling process
+     * @param x x table-coordinate
+     * @param y y table-coordinate
      */
-    private void backtrack(){
-        //@TODO remove previous cell
-        //@TODO place previous value in quarantine
+    private void backtrack(int x, int y){
+        Pair<Integer, Integer> squareCoord = Square.calcSquareNumber(x, y);
+        quarantine.add(squares[squareCoord.getX()][squareCoord.getY()].getNumbers()[x][y]);
     }
 }
